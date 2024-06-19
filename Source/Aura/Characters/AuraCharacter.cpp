@@ -1,5 +1,5 @@
 // Copyright Hakurunai
 
 
-#include "Characters/AuraCharacter.h"
+#include "AuraCharacter.h"
 
