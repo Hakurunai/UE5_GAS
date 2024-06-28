@@ -21,14 +21,14 @@ public :
 	AAuraCharacter();
 	
 	UFUNCTION(BlueprintCallable, Category = Camera)
-	FORCEINLINE void UpdateCameraDistance(float Distance) {SpringArmComponent->TargetArmLength = Distance;}
+	FORCEINLINE void UpdateCameraDistance(const float Distance) {CameraBoom->TargetArmLength = Distance;}
 
 	UFUNCTION(BlueprintCallable, Category = Camera)
-	FORCEINLINE float GetCurrentCameraDistance() const {return SpringArmComponent->TargetArmLength;}
+	FORCEINLINE float GetCurrentCameraDistance() const {return CameraBoom->TargetArmLength;}
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
-	TObjectPtr<USpringArmComponent> SpringArmComponent;
+	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
-	TObjectPtr<UCameraComponent> CameraComponent;
+	TObjectPtr<UCameraComponent> FollowCamera;
 };

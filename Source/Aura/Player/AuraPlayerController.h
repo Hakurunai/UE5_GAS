@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
@@ -52,7 +53,6 @@ class AURA_API AAuraPlayerController : public APlayerController
 
 public :
 	AAuraPlayerController();
-
 	
 protected:
 	virtual void BeginPlay() override;
@@ -61,25 +61,31 @@ protected:
 	
 private :
 	UFUNCTION()
-	void Move(const FInputActionValue& InputActionValue);
+	void ActionMoveCallback(const FInputActionValue& InputActionValue);
 	
 	UFUNCTION()
-	void CameraZoom(const FInputActionValue& InputActionValue);
+	void ActionCameraZoomCallback(const FInputActionValue& InputActionValue);
 
 	UFUNCTION()
+	void ActionCameraRotationCallback(const FInputActionValue& InputActionValue);
+	
+	UFUNCTION()
 	void UpdateCameraZoom(const float DesiredDistance, FCameraZoomData& Data) const;
-
+	
 	UPROPERTY(EditAnywhere, Category = CameraZoom)
 	FCameraZoomData CameraZoomData;
 	
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputMappingContext> AuraContext;
+	TObjectPtr<UInputMappingContext> ContextAura;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> MoveAction;
+	TObjectPtr<UInputAction> ActionMove;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> CameraZoomAction;
+	TObjectPtr<UInputAction> ActionCameraZoom;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> ActionCameraRotation;
 
 	UPROPERTY()
 	AAuraCharacter* AuraCharacter;

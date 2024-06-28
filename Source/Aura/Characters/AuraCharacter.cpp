@@ -10,11 +10,14 @@
 AAuraCharacter::AAuraCharacter()
 {
 #pragma region Camera
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
-	SpringArmComponent->SetupAttachment(RootComponent);
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
+	CameraBoom->SetupAttachment(RootComponent);
 
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-	CameraComponent->SetupAttachment(SpringArmComponent);
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
+	FollowCamera->SetupAttachment(CameraBoom);
+
+	CameraBoom->bUsePawnControlRotation = true;
+	FollowCamera->bUsePawnControlRotation = false;
 #pragma endregion Camera
 
 #pragma region CharacterMovement

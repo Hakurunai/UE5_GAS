@@ -16,11 +16,11 @@ void AAuraPlayerController::BeginPlay()
 	Super::BeginPlay();	
 	
 	//We want to crash early if something is wrong with the input, or player can launch a game he cannot play
-	check(AuraContext);
+	check(ContextAura);
 	
 	auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	check(Subsystem);
-	Subsystem->AddMappingContext(AuraContext, 0);
+	Subsystem->AddMappingContext(ContextAura, 0);
 
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
@@ -28,7 +28,7 @@ void AAuraPlayerController::BeginPlay()
 	FInputModeGameAndUI InputModeData;
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
-	SetInputMode(InputModeData);
+	//SetInputMode(InputModeData);
 }
 
 void AAuraPlayerController::SetupInputComponent()
@@ -40,24 +40,25 @@ void AAuraPlayerController::SetupInputComponent()
 	//Callback
 	{
 		//Movement
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+		EnhancedInputComponent->BindAction(ActionMove, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionMoveCallback);
 
 		//Camera
-		EnhancedInputComponent->BindAction(CameraZoomAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::CameraZoom);
+		EnhancedInputComponent->BindAction(ActionCameraZoom, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionCameraZoomCallback);
+		EnhancedInputComponent->BindAction(ActionCameraRotation, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionCameraRotationCallback);
 	}	
 }
 
 void AAuraPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
+	
 	AuraCharacter = Cast<AAuraCharacter>(GetCharacter());
 	check(AuraCharacter);
 	CameraZoomData.DefaultDistance = AuraCharacter->GetCurrentCameraDistance();
 	CameraZoomData.CurrentDistance = CameraZoomData.DefaultDistance;
 }
 
-void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
+void AAuraPlayerController::ActionMoveCallback(const FInputActionValue& InputActionValue)
 {
 	const FVector2d InputAxisVector = InputActionValue.Get<FVector2d>();	
 
@@ -75,7 +76,7 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 	}
 }
 
-void AAuraPlayerController::CameraZoom(const FInputActionValue& InputActionValue)
+void AAuraPlayerController::ActionCameraZoomCallback(const FInputActionValue& InputActionValue)
 {
 	const auto InputValue = InputActionValue.Get<float>();
 	auto& Data = CameraZoomData;
@@ -101,7 +102,7 @@ void AAuraPlayerController::CameraZoom(const FInputActionValue& InputActionValue
 			UpdateCameraZoom(DesiredDistance, Data);
 		},
 		Data.UpdateRate,
-	true
+		true
 	);
 }
 
@@ -115,11 +116,13 @@ void AAuraPlayerController::UpdateCameraZoom(const float DesiredDistance, FCamer
 	{
 		Data.CurrentDistance = DesiredDistance;
 		GetWorldTimerManager().ClearTimer(Data.TimerHandle);
-	}
-	//Apply new distance computed to the camera boom
-	auto PlayerChara = Cast<AAuraCharacter>(GetCharacter());
-	if (!PlayerChara)
-		return;
-	
-	PlayerChara->UpdateCameraDistance(Data.CurrentDistance);	
+	}	
+	AuraCharacter->UpdateCameraDistance(Data.CurrentDistance);	
+}
+
+void AAuraPlayerController::ActionCameraRotationCallback(const FInputActionValue& InputActionValue)
+{
+	//Rotate around the character
+	const float InputValue = InputActionValue.Get<float>();
+	AddYawInput(InputValue);
 }
