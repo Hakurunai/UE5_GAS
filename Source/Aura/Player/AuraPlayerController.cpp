@@ -4,6 +4,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Aura/Characters/AuraCharacter.h"
+#include "../Camera/CameraZoomData.h"
+#include "Kismet/GameplayStatics.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -28,7 +30,17 @@ void AAuraPlayerController::BeginPlay()
 	FInputModeGameAndUI InputModeData;
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	InputModeData.SetHideCursorDuringCapture(false);
-	//SetInputMode(InputModeData);
+	SetInputMode(InputModeData);
+
+	//Called it here cause OnPossess could be called on a non completely initialized character
+	AuraCharacter = Cast<AAuraCharacter>(GetCharacter());
+	check(AuraCharacter.IsValid());
+	AdjustInitialCameraRotation();
+
+	//CUSTOM TODO : Add speed limit to camera movement
+	auto CamManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	CamManager->ViewPitchMin = CameraRotationData.PitchMin;
+	CamManager->ViewPitchMax = CameraRotationData.PitchMax; 
 }
 
 void AAuraPlayerController::SetupInputComponent()
@@ -52,10 +64,12 @@ void AAuraPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	
-	AuraCharacter = Cast<AAuraCharacter>(GetCharacter());
-	check(AuraCharacter);
+	AuraCharacter = Cast<AAuraCharacter>(GetCharacter());	
+	check(AuraCharacter.IsValid());
 	CameraZoomData.DefaultDistance = AuraCharacter->GetCurrentCameraDistance();
 	CameraZoomData.CurrentDistance = CameraZoomData.DefaultDistance;
+
+	AdjustInitialCameraRotation();
 }
 
 void AAuraPlayerController::ActionMoveCallback(const FInputActionValue& InputActionValue)
@@ -120,9 +134,16 @@ void AAuraPlayerController::UpdateCameraZoom(const float DesiredDistance, FCamer
 	AuraCharacter->UpdateCameraDistance(Data.CurrentDistance);	
 }
 
+void AAuraPlayerController::AdjustInitialCameraRotation()
+{
+	SetControlRotation(AuraCharacter->GetCameraBoom()->GetRelativeRotation());
+	AuraCharacter->GetCameraBoom()->bInheritPitch = true;	
+}
+
 void AAuraPlayerController::ActionCameraRotationCallback(const FInputActionValue& InputActionValue)
 {
 	//Rotate around the character
-	const float InputValue = InputActionValue.Get<float>();
-	AddYawInput(InputValue);
+	const auto InputValue = InputActionValue.Get<FVector2d>();
+	AddYawInput(InputValue.X);
+	AddPitchInput(InputValue.Y);
 }

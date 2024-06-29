@@ -12,11 +12,13 @@ AAuraCharacter::AAuraCharacter()
 #pragma region Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->bInheritYaw = true;
+	CameraBoom->bInheritPitch = false;
+	CameraBoom->bInheritRoll = false;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom);
-
-	CameraBoom->bUsePawnControlRotation = true;
 	FollowCamera->bUsePawnControlRotation = false;
 #pragma endregion Camera
 

@@ -25,7 +25,12 @@ public :
 
 	UFUNCTION(BlueprintCallable, Category = Camera)
 	FORCEINLINE float GetCurrentCameraDistance() const {return CameraBoom->TargetArmLength;}
+
+	UFUNCTION(BlueprintCallable, Category = Camera)
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const {return CameraBoom.Get();}
+	
 protected:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	TObjectPtr<USpringArmComponent> CameraBoom;
 

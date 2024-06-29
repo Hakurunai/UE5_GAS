@@ -5,46 +5,14 @@
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
 #include "GameFramework/PlayerController.h"
+#include "../Camera/CameraZoomData.h"
+#include "../Camera/CameraRotationData.h"
 #include "AuraPlayerController.generated.h"
 
 struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
 class AAuraCharacter;
-
-USTRUCT(BlueprintType)
-struct FCameraZoomData
-{
-	GENERATED_USTRUCT_BODY()
-	
-	FCameraZoomData() : DefaultDistance(1000), CurrentDistance(0), IntervalLength(200), InterpSpeed(2.f),
-	CurrentZoomInterval(0), MaxZoomIntervalNumber(4), UpdateRate(0.01f) {}
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Zoom)
-	float DefaultDistance;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Zoom)
-	float CurrentDistance;
-
-	//Distance moved per interval
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Zoom)
-	float IntervalLength;
-
-	//Time needed to do the zoom/unzoom action
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Zoom)
-	float InterpSpeed;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Zoom)
-	int32 CurrentZoomInterval;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Zoom)
-	uint8 MaxZoomIntervalNumber;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Zoom)
-	float UpdateRate;
-	
-	FTimerHandle TimerHandle;
-};
 
 UCLASS()
 class AURA_API AAuraPlayerController : public APlayerController
@@ -69,12 +37,16 @@ private :
 	UFUNCTION()
 	void ActionCameraRotationCallback(const FInputActionValue& InputActionValue);
 	
-	UFUNCTION()
 	void UpdateCameraZoom(const float DesiredDistance, FCameraZoomData& Data) const;
+
+	void AdjustInitialCameraRotation();
 	
-	UPROPERTY(EditAnywhere, Category = CameraZoom)
+	UPROPERTY(EditAnywhere, Category = Camera)
 	FCameraZoomData CameraZoomData;
-	
+
+	UPROPERTY(EditAnywhere, Category = Camera)
+	FCameraRotationData CameraRotationData;
+
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputMappingContext> ContextAura;
 
@@ -88,5 +60,5 @@ private :
 	TObjectPtr<UInputAction> ActionCameraRotation;
 
 	UPROPERTY()
-	AAuraCharacter* AuraCharacter;
+	TWeakObjectPtr<AAuraCharacter> AuraCharacter;
 };
