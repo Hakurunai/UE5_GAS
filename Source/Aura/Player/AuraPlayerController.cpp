@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "Aura/Characters/AuraCharacter.h"
 #include "../Camera/CameraZoomData.h"
+#include "Aura/Game/InputDataConfig.h"
 #include "Kismet/GameplayStatics.h"
 
 AAuraPlayerController::AAuraPlayerController()
@@ -47,16 +48,16 @@ void AAuraPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	//We want to crash here if something is wrong
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UEnhancedInputComponent* Inputs = CastChecked<UEnhancedInputComponent>(InputComponent);
 	
 	//Callback
 	{
 		//Movement
-		EnhancedInputComponent->BindAction(ActionMove, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionMoveCallback);
+		Inputs->BindAction(InputDataActions->ActionMove, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionMoveCallback);
 
 		//Camera
-		EnhancedInputComponent->BindAction(ActionCameraZoom, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionCameraZoomCallback);
-		EnhancedInputComponent->BindAction(ActionCameraRotation, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionCameraRotationCallback);
+		Inputs->BindAction(InputDataActions->ActionCameraZoom, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionCameraZoomCallback);
+		Inputs->BindAction(InputDataActions->ActionCameraRotation, ETriggerEvent::Triggered, this, &AAuraPlayerController::ActionCameraRotationCallback);
 	}	
 }
 

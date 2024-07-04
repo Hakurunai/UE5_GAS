@@ -3,15 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputActionValue.h"
 #include "GameFramework/PlayerController.h"
 #include "../Camera/CameraZoomData.h"
 #include "../Camera/CameraRotationData.h"
 #include "AuraPlayerController.generated.h"
 
+class UInputDataConfig;
 struct FInputActionValue;
 class UInputMappingContext;
-class UInputAction;
 class AAuraCharacter;
 
 UCLASS()
@@ -50,15 +49,9 @@ private :
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputMappingContext> ContextAura;
 
-	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> ActionMove;
-
-	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> ActionCameraZoom;
-
-	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> ActionCameraRotation;
-
+	UPROPERTY(EditDefaultsOnly, Category = Input)
+	TObjectPtr<UInputDataConfig> InputDataActions;
+	
 	UPROPERTY()
 	TWeakObjectPtr<AAuraCharacter> AuraCharacter;
 };
