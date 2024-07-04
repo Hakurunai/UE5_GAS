@@ -6,6 +6,7 @@
 #include "Aura/Characters/AuraCharacter.h"
 #include "../Camera/CameraZoomData.h"
 #include "Aura/Game/InputDataConfig.h"
+#include "Aura/Interaction/Highlightable.h"
 #include "Aura/Utilities/Print.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -71,6 +72,13 @@ void AAuraPlayerController::OnPossess(APawn* InPawn)
 	CameraZoomData.CurrentDistance = CameraZoomData.DefaultDistance;
 
 	AdjustInitialCameraRotation();
+}
+
+void AAuraPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();
 }
 
 void AAuraPlayerController::ActionMoveCallback(const FInputActionValue& InputActionValue)
@@ -139,6 +147,51 @@ void AAuraPlayerController::AdjustInitialCameraRotation()
 {
 	SetControlRotation(AuraCharacter->GetCameraBoom()->GetRelativeRotation());
 	AuraCharacter->GetCameraBoom()->bInheritPitch = true;	
+}
+
+void AAuraPlayerController::CursorTrace()
+{
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (!CursorHit.bBlockingHit) return;
+
+	LastActor = CurrentActor;
+	CurrentActor = CursorHit.GetActor(); //TScriptInterface will check the interface type for us
+
+	/*
+	 * Line trace from cursors scenario
+	 * 1- LastActor is null and CurrentActor is null
+	 *		-> Do nothing
+	 * 2- LastActor is null and CurrentActor is valid
+	 *		-> Highlight CurrentActor
+	 * 3- LastActor is valid and CurrentActor is null
+	 *		-> UnHighlight LastActor
+	 * 4- Both actors are valid but last and current are different
+	 *		-> UnHighlight LastActor and Highlight CurrentActor
+	 * 5- Both actors are valid and they are the same
+	 *		-> Do nothing
+	 */
+
+	if (LastActor == nullptr)
+	{
+		if (CurrentActor != nullptr) //Case 2
+			CurrentActor->HighLightActor();
+		// else = Case 1 -> DO NOTHING
+	}
+	else //LastActor is valid
+	{
+		if (CurrentActor == nullptr) //Case 3
+			LastActor->UnHighLightActor();
+		else //Both actors are valid
+		{
+			if (LastActor != CurrentActor) //Case 4
+			{
+				LastActor->UnHighLightActor();
+				CurrentActor->HighLightActor();
+			}
+			//else = Case 5 -> DO NOTHING
+		}
+	}
 }
 
 void AAuraPlayerController::ActionCameraRotationCallback(const FInputActionValue& InputActionValue)
