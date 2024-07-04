@@ -6,6 +6,7 @@
 #include "Aura/Characters/AuraCharacter.h"
 #include "../Camera/CameraZoomData.h"
 #include "Aura/Game/InputDataConfig.h"
+#include "Aura/Utilities/Print.h"
 #include "Kismet/GameplayStatics.h"
 
 AAuraPlayerController::AAuraPlayerController()
@@ -38,10 +39,9 @@ void AAuraPlayerController::BeginPlay()
 	check(AuraCharacter.IsValid());
 	AdjustInitialCameraRotation();
 
-	//CUSTOM TODO : Add speed limit to camera movement
 	auto CamManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 	CamManager->ViewPitchMin = CameraRotationData.PitchMin;
-	CamManager->ViewPitchMax = CameraRotationData.PitchMax; 
+	CamManager->ViewPitchMax = CameraRotationData.PitchMax;
 }
 
 void AAuraPlayerController::SetupInputComponent()
@@ -145,6 +145,6 @@ void AAuraPlayerController::ActionCameraRotationCallback(const FInputActionValue
 {
 	//Rotate around the character
 	const auto InputValue = InputActionValue.Get<FVector2d>();
-	AddYawInput(InputValue.X);
-	AddPitchInput(InputValue.Y);
+	AddYawInput(InputValue.X * CameraRotationData.YawRotationSensibility);
+	AddPitchInput(InputValue.Y * CameraRotationData.PitchRotationSensibility);
 }

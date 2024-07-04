@@ -10,13 +10,13 @@ struct FCameraRotationData
 {
 	GENERATED_USTRUCT_BODY()
 
-	FCameraRotationData() : YawRotationSpeed(400.f), PitchRotationSpeed(200.f), PitchMin(290.f), PitchMax(315.f) {}
+	FCameraRotationData() : YawRotationSensibility(1.f), PitchRotationSensibility(1.f), PitchMin(290.f), PitchMax(315.f) {}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rotation)
-	float YawRotationSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rotation, meta = (ClampMin = 0.1f, ClampMax = 2.f, UIMin = 0.1f, UIMax = 2.f))
+	float YawRotationSensibility;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rotation)
-	float PitchRotationSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rotation, meta = (ClampMin = 0.1f, ClampMax = 2.f, UIMin = 0.1f, UIMax = 2.f))
+	float PitchRotationSensibility;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Rotation)
 	float PitchMin;
