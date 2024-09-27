@@ -19,7 +19,14 @@ class AURA_API AAuraCharacter : public ACharacterBase
 
 public :
 	AAuraCharacter();
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+private :
+	void InitAbilityActorInfo();
 	
+#pragma region Camera
+public :
 	UFUNCTION(BlueprintCallable, Category = Camera)
 	FORCEINLINE void UpdateCameraDistance(const float Distance) {CameraBoom->TargetArmLength = Distance;}
 
@@ -36,4 +43,5 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	TObjectPtr<UCameraComponent> FollowCamera;
+#pragma endregion Camera
 };

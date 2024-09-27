@@ -17,7 +17,12 @@ class AURA_API AEnemy : public ACharacterBase, public IHighlightable
 
 public :
 	AEnemy();
-	
+
+	// Highlightable interface
 	virtual void HighLightActor() override;
 	virtual void UnHighLightActor() override;
+	// END Highlightable interface
+
+protected :
+	virtual void BeginPlay() override;
 };
