@@ -4,7 +4,9 @@
 #include "AuraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "Aura/Player/AuraPlayerController.h"
 #include "Aura/Player/AuraPlayerState.h"
+#include "Aura/UI/HUD/AuraHUD.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -60,4 +62,14 @@ void AAuraCharacter::InitAbilityActorInfo()
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
+
+	//GetController is valid only on local client in multiplayer
+	if (AAuraPlayerController* auraPlayerController = Cast<AAuraPlayerController>(GetController()))
+	{
+		//GetHUD is valid only on local client in multiplayer
+		if (AAuraHUD* auraHud = Cast<AAuraHUD>(auraPlayerController->GetHUD()))
+		{
+			auraHud->InitOverlay(auraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}	
 }
