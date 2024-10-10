@@ -23,8 +23,8 @@ void AAuraPlayerController::BeginPlay()
 	//We want to crash early if something is wrong with the input, or player can launch a game he cannot play
 	check(ContextAura);
 	
-	auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if(Subsystem) //is valid only for local client
+	 //is valid only for local client
+	if(auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(ContextAura, 0);
 	}
@@ -39,7 +39,6 @@ void AAuraPlayerController::BeginPlay()
 
 	//Called it here cause OnPossess could be called on a non completely initialized character
 	AuraCharacter = Cast<AAuraCharacter>(GetCharacter());
-	check(AuraCharacter.IsValid());
 	AdjustInitialCameraRotation();
 
 	auto CamManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
@@ -147,8 +146,11 @@ void AAuraPlayerController::UpdateCameraZoom(const float DesiredDistance, FCamer
 
 void AAuraPlayerController::AdjustInitialCameraRotation()
 {
-	SetControlRotation(AuraCharacter->GetCameraBoom()->GetRelativeRotation());
-	AuraCharacter->GetCameraBoom()->bInheritPitch = true;	
+	if (AuraCharacter != nullptr)
+	{
+		SetControlRotation(AuraCharacter->GetCameraBoom()->GetRelativeRotation());
+		AuraCharacter->GetCameraBoom()->bInheritPitch = true;	
+	}	
 }
 
 void AAuraPlayerController::CursorTrace()
